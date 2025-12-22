@@ -7,7 +7,7 @@ export const agent_controller = async (req, res) => {
   try {
     const { userId, prompt } = req.body;
 
-    // ✅ 1. Validate input
+    // Validate input
     if (!userId || !prompt) {
       return res.status(400).json({
         success: false,
@@ -15,10 +15,10 @@ export const agent_controller = async (req, res) => {
       });
     }
 
-    // ✅ 2. Embed ONCE
+    //  Embed ONCE
     const embedding = await embedText(prompt);
 
-    // ✅ 3. Store STM episode
+    //   Store STM episode
     const episode = await Episode.create({
       userId,
       summary: prompt,
@@ -27,20 +27,20 @@ export const agent_controller = async (req, res) => {
       embedding
     });
 
-    // ✅ 4. Recall STM (NO re-embedding)
+    //   Recall STM (NO re-embedding)
     const recalledEpisodes = await recallEpisodes({
       userId,
       embedding,
       limit: 5
     });
 
-    // ✅ 5. Run Python agent
+    //   Run Python agent
     const agentResponse = await runAgent({
       prompt,
       memory: recalledEpisodes
     });
 
-    // ✅ 6. Respond
+    //  Respond
     res.status(200).json({
       success: true,
       episodeStored: episode._id,

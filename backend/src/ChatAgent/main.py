@@ -13,17 +13,15 @@ from langchain_core.messages import (
 
 load_dotenv()
 
-# -----------------------------
-# Agent State
-# -----------------------------
+# Agent Stat
 class AgentState(TypedDict):
     messages: List[BaseMessage]
     system_prompt: SystemMessage
 
 
-# -----------------------------
+
 # LLM
-# -----------------------------
+
 llm = ChatGroq(
     model_name="llama-3.1-8b-instant",
     api_key=os.getenv("GROQ_API_KEY")
@@ -36,9 +34,8 @@ def trim_messages(messages: List[BaseMessage]) -> List[BaseMessage]:
     return messages[-MAX_MESSAGES:]
 
 
-# -----------------------------
-# SYSTEM PROMPT (STRICT MEMORY)
-# -----------------------------
+# System prompt for the llm
+
 def build_chat_system_prompt(memory_text: str) -> SystemMessage:
     return SystemMessage(
         content=f"""
@@ -57,9 +54,9 @@ RULES:
     )
 
 
-# -----------------------------
-# EPISODIC EXTRACTION PROMPT
-# -----------------------------
+
+# episode prompt
+
 EPISODE_PROMPT = """
 You are an episodic memory extractor.
 
@@ -101,9 +98,9 @@ def extract_episode(user_text: str):
         }
 
 
-# -----------------------------
-# CHAT NODE
-# -----------------------------
+
+# Chat node agent work
+
 def chat_agent(state: AgentState) -> AgentState:
     state["messages"] = trim_messages(state["messages"])
     full_input = [state["system_prompt"]] + state["messages"]
@@ -115,9 +112,8 @@ def chat_agent(state: AgentState) -> AgentState:
     return state
 
 
-# -----------------------------
 # GRAPH
-# -----------------------------
+
 graph = StateGraph(AgentState)
 graph.add_node("chat", chat_agent)
 graph.add_edge(START, "chat")
@@ -125,14 +121,14 @@ graph.add_edge("chat", END)
 app = graph.compile()
 
 
-# -----------------------------
-# MAIN ENTRY (NODE ↔ PYTHON)
-# -----------------------------
+
+# MAIN function which take the data from the node to python
+
 def main():
     raw_input = sys.stdin.read()
     data = json.loads(raw_input)
 
-    # 🔥 MATCH NODE PAYLOAD
+    # MATCH NODE PAYLOAD
     user_input = data["prompt"]
     episodic_memory = data.get("memory", [])
 
