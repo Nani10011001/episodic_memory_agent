@@ -1,4 +1,4 @@
-🧠 Short-Term Memory AI Agent (STM)
+🧠 Episodic-Term Memory AI Agent (STM)
 
 A memory-aware AI assistant that can store, recall, and reason over episodic user memories while avoiding hallucinations.
 Built with React, Node.js, MongoDB, and a Python LangGraph agent.
